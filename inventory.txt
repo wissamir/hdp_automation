@@ -1,0 +1,23 @@
+opnstk1 ansible_host=root@opnstk1
+opnstk2 ansible_host=root@opnstk2 jbod_hdds=0
+opnstk3 ansible_host=opnstk3 ansible_user=root jbod_hdds=9 mount_point_prefix=data
+opnstk4 ansible_host=root@opnstk4 jbod_hdds=8 mount_point_prefix=data
+opnstk5 ansible_host=root@opnstk5 jbod_hdds=6 mount_point_prefix=data
+opnstk6 ansible_host=root@opnstk6 jbod_hdds=11 mount_point_prefix=data
+
+[name_nodes]
+opnstk1
+opnstk2
+
+
+[data_nodes]
+opnstk3
+opnstk4
+opnstk5
+opnstk6
+
+
+
+[all:children]
+name_nodes
+data_nodes
