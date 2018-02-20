@@ -1,0 +1,45 @@
+- name: Install device mapper multipath and start services
+  hosts: opnstk3, opnstk4, opnstk5, opnstk6
+  roles:
+    - inststart-dev-mapper
+
+- name: Mapping SCSIIDs to logical device names
+  hosts: opnstk3, opnstk4, opnstk5, opnstk6
+  roles:
+    - scsiid-mapper
+
+- name: Healthcheck1 - check SCSIIDs identicallity
+  hosts: localhost
+  roles:
+    - healthcheck1-scsiid-identicality
+
+
+- name: Create blacklists...
+  hosts: localhost
+  roles:
+    - create-blacklists
+
+
+- name: Healthcheck2 - SCSIIDs mappings
+  hosts: localhost
+  roles:
+    - healthcheck2-scsiid-mappings
+
+
+- name: Apply blacklists..
+  hosts: opnstk3, opnstk4, opnstk5, opnstk6
+  roles:
+    - apply-blacklists
+
+
+- name: calcmd5sum..
+  hosts: opnstk3, opnstk4, opnstk5, opnstk6
+  roles:
+    - calcmd5sum
+
+
+
+- name: Healthcheck3 - check if md5sum values correspond to the expected number of mounted volumes
+  hosts: localhost
+  roles:
+    - healthcheck3-md5sum
