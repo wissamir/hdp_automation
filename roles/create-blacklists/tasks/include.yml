@@ -1,0 +1,193 @@
+#- include variables
+#  include_vars: "{{ leftovers }}"
+#- import_playbook: main.yml
+
+# corner case.. first list is empty [] ??? does it treat it?
+
+- set_fact: current_node={{ groups["data_nodes"][i|int] }}
+- name: printing mount point prefix
+  debug: var={{ hostvars['%s'|format(current_node)]["mount_point_prefix"]}}
+#  debug: var={{hostvars[{{current_node}}]}}
+
+- name: printing current node
+  debug: var=current_node
+
+- name: include.yml printing hostvars['localhost']['leftovers']
+  debug: var=hostvars['localhost']['leftovers']
+
+- name: setting batches
+#  set_fact: batches={{ leftovers | batch(hostvars[groups["data_nodes"][i|int]]["jbod_hdds"]) | list }}
+  set_fact: batches={{ hostvars['localhost']['leftovers'] | batch(hostvars[groups["data_nodes"][i|int]]["jbod_hdds"]) | list }}
+
+- name: printing batches
+  debug: var=batches
+#
+- name: setting scsiid_xx
+#  set_fact: scsiid_{{i}}={% if batches|length >= 1 %}{{ batches[0] }}{% else %}{{ []|list }}{% endif %}
+  set_fact: scsiid_{{current_node}}={% if batches|length >= 1 %}{{ batches[0] }}{% else %}{{ []|list }}{% endif %}
+
+
+- set_fact: x={{ 'scsiid_%s'|format(current_node) }}
+
+- name: testing TWO-WAY DYNAMIC
+  debug: var=x
+
+- name: setting blacklist_xx
+#  set_fact: blacklist_{{current_node}}={{ hostvars['localhost']['scsiid2'] | difference('scsiid_%s'|format(current_node)) }}
+   # this did not work.. it could not recognize the variable 'scsiid_%s'|format(current_node), and considered it undefined, or empty list and
+   # the calculated blacklist became the whole scsiid2 (since it substracts an empty list)... to solve the issue you used hostvars['localhost'] in order to reference
+   # the variable 'scsiid_%s'|format(current_node)
+  set_fact: blacklist_{{current_node}}={{ hostvars['localhost']['scsiid2'] | difference(hostvars['localhost']['scsiid_%s'|format(current_node)]) }}
+
+
+# The above is soo important example! it shows how you can nest jinja2 expressions!
+#   - on the left-hand side you have blacklist_{{current_node}} which is a normal jinja2 expression.. creates dynamic content based on current_node
+#   - on the right-hand side you have {{ hostvars['localhost']['scsiid2'] | difference('scsiid_%s'|format(current_node)) }} which is kind of nested jinja2 expression!
+#     It has two dynamic parts: the first and outer expression inside {{ }} is a dynamic expression, but inside it there is another dynamic expression which is scsiid_%s
+#     and in this way you can have two-way dynamic expressions inside jinja2 expression!
+
+#- set_fact: wissam={% for x in range(10) %}{{x}},{% endfor %}
+#- name: debugging wissam
+#  debug: var=wissam
+
+#- set_fact: mount_points_{{current_node}}={% for item in range(1, hostvars['localhost']['scsiid_%s'|format(current_node)]|length + 1) %}data{{item}},{% endfor %}
+- set_fact: mount_points_{{current_node}}={% for item in range(1, hostvars['localhost']['scsiid_%s'|format(current_node)]|length + 1) %}{{hostvars['%s'|format(current_node)]["mount_point_prefix"]}}{{item}},{% endfor %}
+- set_fact: mount_points_{{current_node}}={{ hostvars['localhost']['mount_points_%s'|format(current_node)].split(",") }}
+- set_fact: mount_points_{{current_node}}={{ hostvars['localhost']['mount_points_%s'|format(current_node)][0:-1] }}
+
+#- set_fact: scsiid_mount_points_{{current_node}}={% for item in list(zip('scsiid_%s'|format(current_node),'mount_points_%s'|format(current_node))) %}{{item}},{%endfor%}
+# there is no zip defined in jinja2! you might need to add this filter! see how to extend jinja2!
+# So, you went to define a new jinja2 filter for zip operation ... you can write your own code for example under <project_dir>/filter_plugins/myzip.py
+#    def myzip(list1, list2):
+#         return list(zip(list1, list2))
+#    Class FilterModule(object):
+#       def filters(self):
+#          return {
+#             'myzip': zip
+#          }
+#  Then export ANSIBLE_FILTER_PLUGINS=<project_dir>/filter_plugins;
+#
+#   to see how jinja2 built-in filters are written you looked in the ansible source code: /Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/ansible/plugins
+#   especially in /Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/ansible/plugins/filter/mathstuff.py
+#   and you were surprised to find that zip filter already exists (it is actually an empty function.. they call direclty the built-in python zip method) - see the FilterModule class
+#  So, you tried the followed:
+#   set_fact: scsiid_mount_points_{{current_node}}={{ hostvars['localhost']['scsiid_%s'|format(current_node)] | zip(hostvars['localhost']['mount_points_%s'|format(current_node)]) }}
+#  and it gave you
+#
+#  ok: [localhost] => {
+#      "scsiid_mount_points_opnstk4": "<itertools.izip object at 0x104d00d40>"
+#  }
+#
+#  and this is since you're under python 3.6.1 .. (remember zip changed behaviour between 2.7 and 3.6... it 3.6 it returns an iterator only)
+#  so, you put another list filter and got what you want
+#  set_fact: scsiid_mount_points_{{current_node}}={{ hostvars['localhost']['scsiid_%s'|format(current_node)] | zip(hostvars['localhost']['mount_points_%s'|format(current_node)]) | list }}
+#   now it gives what you wish!
+#ok: [localhost] => {
+#    "scsiid_mount_points_opnstk3": [
+#        [
+#            "35000c50062815bb3",
+#            "data1"
+#        ],
+#        [
+#            "35000cca01a4e72b8",
+#            "data2"
+#        ],
+#        [
+#            "35000cca01a4e875c",
+#            "data3"
+#        ],
+#        [
+#            "35000c50062800e7b",
+#            "data4"
+#        ],
+#        [
+#            "35000cca01a4debc0",
+#            "data5"
+#        ],
+#        [
+#            "35000cca01a9a2c44",
+#            "data6"
+#        ],
+#        [
+#            "35000cca01a4dfae4",
+#            "data7"
+#        ],
+#        [
+#            "35000c50062806bbb",
+#            "data8"
+#        ],
+#        [
+#            "35000cca01a9acc80",
+#            "data9"
+#        ],
+#        [
+#            "35000cca01a4dcf2c",
+#            "data10"
+#        ]
+#    ]
+#}
+#
+# zip changes behavior between python 2.7 and 3.6
+#"	in 2.7
+# 	>>> x = [1, 2, 3]
+# 	>>> y = [4, 5, 6]
+# 	>>> zipped = zip(x, y)
+# 	>>> zipped
+# 	[(1, 4), (2, 5), (3, 6)]
+#"	In 3.6
+# 	>>> x = [1, 2, 3 ]
+# 	>>> y = [4, 5, 6]
+# 	>>> zipped = zip(x, y)
+#
+# 	>>> zipped
+# 	<zip object at 0x1072d2088>
+# 	>>> list(zipped)
+# 	[(1, 4), (2, 5), (3, 6)]
+
+#
+
+- set_fact: scsiid_mount_points_{{current_node}}={{ hostvars['localhost']['scsiid_%s'|format(current_node)] | zip(hostvars['localhost']['mount_points_%s'|format(current_node)]) | list }}
+
+
+- name: debugging scsiid_mount_points_
+  debug: var="{{'scsiid_mount_points_%s'|format(current_node)}}"
+
+- name: debugging mount_points
+  debug: var="{{'mount_points_%s'|format(current_node)}}"
+
+
+- name: printing scsiid_current_node...
+  debug: var=scsiid_{{current_node}}
+
+- name: printing blacklist_current_node...
+  debug: var=blacklist_{{current_node}}
+
+
+#
+- name: setting leftovers
+  set_fact: leftovers={% if batches|length > 1 %}{{batches[1:]}}{% else %}{{[]|list}}{%endif%}
+
+- name: after setting leftovers...
+  debug: var=hostvars['localhost']['leftovers']
+
+- name: reassembling1...
+#  set_fact: leftovers1={% if hostvars['localhost']['leftovers']|length == 0 %}{{ hostvars['localhost']['leftovers'] }}{% elif hostvars['localhost']['leftovers']|length == 1 %}{{ hostvars['localhost']['leftovers'][0] }}{% else %}{% for list in hostvars['localhost']['leftovers'][1:] %}{{ hostvars['localhost']['leftovers'][0]|union(list) }},{% endfor %}{% endif %}
+#  set_fact: leftovers1={% if hostvars['localhost']['leftovers']|length == 1 %}{{ hostvars['localhost']['leftovers'][0] }}{% else %}{% for list in hostvars['localhost']['leftovers'][1:] %}{{ hostvars['localhost']['leftovers'][0]|union(list) }}{% endfor %}{% endif %}
+# problema reassembling!
+  set_fact: leftovers={% if hostvars['localhost']['leftovers']|length != 0 %}{% for list in hostvars['localhost']['leftovers'] %}{% for x in list %}{{x}},{% endfor %}{% endfor %}{% endif %}
+
+- name: reassembling2...
+  set_fact: leftovers={{ leftovers.split(',') }}
+
+- name: reassembling3...
+  set_fact: leftovers={{ leftovers[0:-1] }}
+
+#- name: assigning back to original leftovers variable
+#  set_fact: leftovers={{ leftovers1 }}
+
+- name: leftovers after reassembling ... printing hostvars['localhost']['leftovers']
+  debug: var=hostvars['localhost']['leftovers']
+
+
+- name: leftovers after reassembling ... printing leftovers
+  debug: var=leftovers

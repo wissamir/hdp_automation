@@ -1,0 +1,70 @@
+---
+# tasks file for create-blacklists
+
+# set a localhost scsiid2 variable using one of the available datanodes (scsiid2 variable for the different datanodes must be identical)
+- set_fact: scsiid2={{hostvars['opnstk3']['scsiid2']}}
+  when: "'opnstk3' in groups['data_nodes']"
+
+- set_fact: scsiid2={{hostvars['opnstk4']['scsiid2']}}
+  when: "'opnstk4' in groups['data_nodes']"
+
+- set_fact: scsiid2={{hostvars['opnstk5']['scsiid2']}}
+  when: "'opnstk5' in groups['data_nodes']"
+
+- set_fact: scsiid2={{hostvars['opnstk6']['scsiid2']}}
+  when: "'opnstk6' in groups['data_nodes']"
+
+- set_fact: leftovers={{ scsiid2 }}
+#- name: putting it all together
+#  set_fact: batches={{ leftovers | batch(hostvars[groups["data_nodes"][item|int]]["jbod_hdds"]) | list }}
+#  set_fact: scsiid_{{item}}={{ batches[0] }}
+#  set_fact: leftovers={% if batches|length > 1 %}{{batches[1:]}}{% else %}{{[]|list}}{%endif%}
+#  now need to reassemble leftovers into one list
+#- include: include.yml
+- include_tasks: include.yml
+  with_sequence: start=0 end={{ groups['data_nodes'][1:] | length }}
+  loop_control:
+     loop_var: i
+#  when: leftovers != {{[]|list}}
+#  when: hostvars['localhost']['leftovers'] != {{[]|list}}
+  when: hostvars['localhost']['leftovers'] != []|list
+
+#  when: "{{ hostvars['localhost']['leftovers']|length == 0 }}"
+
+- name: the whole list
+  debug: var=scsiid2
+
+
+- name: printing scsiid_opnstk3
+  debug: var=scsiid_opnstk3
+  when: "'opnstk3' in groups['data_nodes']"
+
+- name: printing blacklist_opnstk3
+  debug: var=blacklist_opnstk3
+  when: "'opnstk3' in groups['data_nodes']"
+
+- name: printing scsiid_opnstk4
+  debug: var=scsiid_opnstk4
+  when: "'opnstk4' in groups['data_nodes']"
+
+- name: printing blacklist_opnstk4
+  debug: var=blacklist_opnstk4
+  when: "'opnstk4' in groups['data_nodes']"
+
+
+- name: printing scsiid_opnstk5
+  debug: var=scsiid_opnstk5
+  when: "'opnstk5' in groups['data_nodes']"
+
+- name: printing blacklist_opnstk5
+  debug: var=blacklist_opnstk5
+  when: "'opnstk5' in groups['data_nodes']"
+
+
+- name: printing scsiid_opnstk6
+  debug: var=scsiid_opnstk6
+  when: "'opnstk6' in groups['data_nodes']"
+
+- name: printing blacklist_opnstk6
+  debug: var=blacklist_opnstk6
+  when: "'opnstk6' in groups['data_nodes']"
