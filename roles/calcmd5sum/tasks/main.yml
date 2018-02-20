@@ -1,0 +1,68 @@
+---
+# tasks file for healthcheck
+# calculates the md5sum of all files in each single mounted volume! do the checksum after unmounting and re-mounting the volumes
+# since sometimes if some volume is mounted by more than one node by mistake, and you write to it from both nodes, due to
+# buffer/cache effects you might still see two distinct writes rather than only one.. only by unmounting and re-mounting the volume
+# you will figure out that only the last write done will last!
+
+- name: unmount volumes on opnstk3
+  shell: df -h | grep /dev/mapper | awk '{print $NF}' | xargs umount
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk3"
+  ignore_errors: yes
+
+- name: unmount volumes on opnstk4
+  shell: df -h | grep /dev/mapper | awk '{print $NF}' | xargs umount
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk4"
+  ignore_errors: yes
+
+- name: unmount volumes on opnstk5
+  shell: df -h | grep /dev/mapper | awk '{print $NF}' | xargs umount
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk5"
+  ignore_errors: yes
+
+- name: unmount volumes on opnstk6
+  shell: df -h | grep /dev/mapper | awk '{print $NF}' | xargs umount
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
+  ignore_errors: yes
+
+
+- name: Mounting volumes partitions on opnstk3
+  command: mount /dev/mapper/{{ hostvars["opnstk3"]["scsi"][item.0]["opnstk3.e4dot"][0] }}  /{{ item.1 }}
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk3"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk3"
+
+- name: Mounting volumes partitions on opnstk4
+  command: mount /dev/mapper/{{ hostvars["opnstk4"]["scsi"][item.0]["opnstk4.e4dot"][0] }}  /{{ item.1 }}
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk4"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk4"
+
+
+- name: Mounting volumes partitions on opnstk5
+  command: mount /dev/mapper/{{ hostvars["opnstk5"]["scsi"][item.0]["opnstk5.e4dot"][0] }}  /{{ item.1 }}
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk5"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk5"
+
+
+- name: Mounting volumes partitions on opnstk6
+  command: mount /dev/mapper/{{ hostvars["opnstk6"]["scsi"][item.0]["opnstk6.e4dot"][0] }}  /{{ item.1 }}
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk6"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
+
+
+
+- name: compute md5sum
+  script: ../../sbin/checkvols.py
+  register: md5sums
+  when: inventory_hostname in groups['data_nodes']
+
+- set_fact: md5sums={{ md5sums.stdout_lines[1] }}
+  when: inventory_hostname in groups['data_nodes']
+
+- name: printing md5sums
+  debug: var=md5sums
+  when: inventory_hostname in groups['data_nodes']
+
