@@ -1,0 +1,32 @@
+---
+# tasks file for healthcheck3-md5sum
+
+- set_fact: md5sum_all={{[]|list}}
+
+- set_fact: md5sum_all={{ md5sum_all | union(hostvars[groups["data_nodes"][i|int]]["md5sums"])}}
+  with_sequence: start=0 end={{ groups['data_nodes'][1:] | length }}
+  loop_control:
+     loop_var: i
+
+
+- set_fact: md5sum_all_length={{ md5sum_all | unique | length}}
+
+- set_fact: expected_length=0
+
+- set_fact: expected_length={{ (hostvars[groups["data_nodes"][i|int]]["jbod_hdds"]|int|abs + expected_length|int|abs)|int|abs }}
+  with_sequence: start=0 end={{ groups['data_nodes'][1:] | length }}
+  loop_control:
+     loop_var: i
+
+- name: printing md5sum_all
+  debug: var=md5sum_all
+
+- name: printing md5sum_all_length
+  debug: var=md5sum_all_length
+
+- name: printing expected_length
+  debug: var=expected_length
+
+- name: checking that md5sum list corresponds to different volumes
+  debug:
+  failed_when: expected_length != md5sum_all_length
