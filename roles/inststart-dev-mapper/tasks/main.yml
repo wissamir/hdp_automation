@@ -1,0 +1,32 @@
+---
+# tasks file for inststart-dev-mapper
+- name: installing device mapper multipath software
+  yum:
+    name: device-mapper-multipath
+    state: present
+  when: inventory_hostname in groups['data_nodes']
+
+- name: copy template multipath configuration file
+  copy:
+    src: ../../conf/multipath.conf
+    dest: /etc/multipath.conf
+    owner: root
+    group: root
+    mode: 0600
+  when: inventory_hostname in groups['data_nodes']
+
+
+- name: stopping device mapper multipath service
+  service:
+    name: multipathd
+    state: stopped
+    enabled: yes
+  when: inventory_hostname in groups['data_nodes']
+
+
+- name: starting device mapper multipath service
+  service:
+    name: multipathd
+    state: started
+    enabled: yes
+  when: inventory_hostname in groups['data_nodes']
