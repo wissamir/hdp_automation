@@ -1,0 +1,107 @@
+---
+# tasks file for healthcheck2-scsiid-mappings
+
+
+- set_fact: opnstk3_intersect_opnstk4={{ scsiid_opnstk3 | intersect(scsiid_opnstk4) }}
+  when: "'opnstk3' in groups['data_nodes'] and  'opnstk4' in groups['data_nodes']"
+- name: check overlapping between opnstk3 and opnstk4
+  debug: var=opnstk3_intersect_opnstk4
+  failed_when: opnstk3_intersect_opnstk4 != []
+  when: "'opnstk3' in groups['data_nodes'] and  'opnstk4' in groups['data_nodes']"
+
+
+- set_fact: opnstk3_intersect_opnstk5={{ scsiid_opnstk3 | intersect(scsiid_opnstk5) }}
+  when: "'opnstk3' in groups['data_nodes'] and  'opnstk5' in groups['data_nodes']"
+- name: check overlapping between opnstk3 and opnstk5
+  debug: var=opnstk3_intersect_opnstk5
+  failed_when: opnstk3_intersect_opnstk5 != []
+  when: "'opnstk3' in groups['data_nodes'] and  'opnstk5' in groups['data_nodes']"
+
+
+- set_fact: opnstk3_intersect_opnstk6={{ scsiid_opnstk3 | intersect(scsiid_opnstk6) }}
+  when: "'opnstk3' in groups['data_nodes'] and  'opnstk6' in groups['data_nodes']"
+- name: check overlapping between opnstk3 and opnstk6
+  debug: var=opnstk3_intersect_opnstk6
+  failed_when: opnstk3_intersect_opnstk6 != []
+  when: "'opnstk3' in groups['data_nodes'] and  'opnstk6' in groups['data_nodes']"
+
+
+- set_fact: opnstk4_intersect_opnstk5={{ scsiid_opnstk4 | intersect(scsiid_opnstk5) }}
+  when: "'opnstk4' in groups['data_nodes'] and  'opnstk5' in groups['data_nodes']"
+- name: check overlapping between opnstk4 and opnstk5
+  debug: var=opnstk4_intersect_opnstk5
+  failed_when: opnstk4_intersect_opnstk5 != []
+  when: "'opnstk4' in groups['data_nodes'] and  'opnstk5' in groups['data_nodes']"
+
+
+- set_fact: opnstk4_intersect_opnstk6={{ scsiid_opnstk4 | intersect(scsiid_opnstk6) }}
+  when: "'opnstk4' in groups['data_nodes'] and  'opnstk6' in groups['data_nodes']"
+- name: check overlapping between opnstk4 and opnstk6
+  debug: var=opnstk4_intersect_opnstk6
+  failed_when: opnstk4_intersect_opnstk6 != []
+  when: "'opnstk4' in groups['data_nodes'] and  'opnstk6' in groups['data_nodes']"
+
+
+- set_fact: opnstk5_intersect_opnstk6={{ scsiid_opnstk5 | intersect(scsiid_opnstk6) }}
+  when: "'opnstk5' in groups['data_nodes'] and  'opnstk6' in groups['data_nodes']"
+- name: check overlapping between opnstk5 and opnstk6
+  debug: var=opnstk5_intersect_opnstk6
+  failed_when: opnstk5_intersect_opnstk6 != []
+  when: "'opnstk5' in groups['data_nodes'] and  'opnstk6' in groups['data_nodes']"
+
+
+- set_fact: opnstk3_union_blacklist3={{ scsiid_opnstk3 | union(blacklist_opnstk3) }}
+  when: "'opnstk3' in groups['data_nodes']"
+- name: check union drives managed by opnstk3 and opnstk3's blacklist
+  debug: var=opnstk3_union_blacklist3
+  failed_when: "opnstk3_union_blacklist3|sort|list != scsiid2|sort|list"
+  when: "'opnstk3' in groups['data_nodes']"
+
+
+- set_fact: opnstk4_union_blacklist4={{ scsiid_opnstk4 | union(blacklist_opnstk4) }}
+  when: "'opnstk4' in groups['data_nodes']"
+
+#- set_fact: tmp={{ opnstk4_union_blacklist4|sort|list }}
+#- set_fact: tmp2={{ scsiid2|sort|list }}
+#
+#- name: printing opnstk4_union_blacklist4|reverse|list
+#  debug: var=tmp
+#
+#- name: printing scsiid2|reverse|list
+#  debug: var=tmp2
+
+- name: check union drives managed by opnstk4 and opnstk4's blacklist
+  debug: var=opnstk4_union_blacklist4
+  failed_when: "opnstk4_union_blacklist4|sort|list != scsiid2|sort|list"
+  when: "'opnstk4' in groups['data_nodes']"
+
+
+- set_fact: opnstk5_union_blacklist5={{ scsiid_opnstk5 | union(blacklist_opnstk5) }}
+  when: "'opnstk5' in groups['data_nodes']"
+- name: check union drives managed by opnstk5 and opnstk5's blacklist
+  debug: var=opnstk5_union_blacklist5
+  failed_when: "opnstk5_union_blacklist5|sort|list != scsiid2|sort|list"
+  when: "'opnstk5' in groups['data_nodes']"
+
+
+- set_fact: opnstk6_union_blacklist6={{ scsiid_opnstk6 | union(blacklist_opnstk6) }}
+  when: "'opnstk6' in groups['data_nodes']"
+- name: check union drives managed by opnstk6 and opnstk6's blacklist
+  debug: var=opnstk6_union_blacklist6
+  failed_when: "opnstk6_union_blacklist6|sort|list != scsiid2|sort|list"
+  when: "'opnstk6' in groups['data_nodes']"
+
+
+- set_fact: unifyall={{ scsiid_opnstk3 | union(scsiid_opnstk4) }}
+  when: "'opnstk3' in groups['data_nodes'] and 'opnstk4' in groups['data_nodes'] and 'opnstk5' in groups['data_nodes'] and 'opnstk6' in groups['data_nodes']"
+
+- set_fact: unifyall={{ unifyall | union(scsiid_opnstk5) }}
+  when: "'opnstk3' in groups['data_nodes'] and 'opnstk4' in groups['data_nodes'] and 'opnstk5' in groups['data_nodes'] and 'opnstk6' in groups['data_nodes']"
+
+- set_fact: unifyall={{ unifyall | union(scsiid_opnstk6) }}
+  when: "'opnstk3' in groups['data_nodes'] and 'opnstk4' in groups['data_nodes'] and 'opnstk5' in groups['data_nodes'] and 'opnstk6' in groups['data_nodes']"
+
+- name: check union all drives managed by all data nodes
+  debug: var=unifyall
+  failed_when: "unifyall|sort|list != scsiid2|sort|list"
+  when: "'opnstk3' in groups['data_nodes'] and 'opnstk4' in groups['data_nodes'] and 'opnstk5' in groups['data_nodes'] and 'opnstk6' in groups['data_nodes']"
