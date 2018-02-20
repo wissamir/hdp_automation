@@ -1,0 +1,36 @@
+---
+# tasks file for healthcheck1-scsiid-identicality
+- name: check that all data nodes can see all available HDD devices - opnstk3, opnstk4
+  debug:
+  failed_when: hostvars['opnstk3']['scsiid2'] != hostvars['opnstk4']['scsiid2'] # simulate an error by hostvars['opnstk3']['scsiid2'][0:-2] != hostvars['opnstk4']['scsiid2']
+  when: "'opnstk3' in groups['data_nodes'] and 'opnstk4' in groups['data_nodes']"
+
+- name: check that all data nodes can see all available HDD devices - opnstk3, opnstk5
+  debug:
+  failed_when: hostvars['opnstk3']['scsiid2'] != hostvars['opnstk5']['scsiid2'] # simulate an error by hostvars['opnstk3']['scsiid2'][0:-2] != hostvars['opnstk4']['scsiid2']
+  when: "'opnstk3' in groups['data_nodes'] and 'opnstk5' in groups['data_nodes']"
+
+- name: check that all data nodes can see all available HDD devices - opnstk3, opnstk6
+  debug:
+  failed_when: hostvars['opnstk3']['scsiid2'] != hostvars['opnstk6']['scsiid2'] # simulate an error by hostvars['opnstk3']['scsiid2'][0:-2] != hostvars['opnstk4']['scsiid2']
+  when: "'opnstk3' in groups['data_nodes'] and 'opnstk6' in groups['data_nodes']"
+
+# if above checks passes, then by commutativity we get:
+# hostvars['opnstk4']['scsiid2'] != hostvars['opnstk5']['scsiid2']
+# hostvars['opnstk4']['scsiid2'] != hostvars['opnstk6']['scsiid2']
+# hostvars['opnstk5']['scsiid2'] != hostvars['opnstk6']['scsiid2']
+# but add individual checks anyway, since opnstk3 might be removed from the datanodes in the inventory file
+- name: check that all data nodes can see all available HDD devices - opnstk4, opnstk5
+  debug:
+  failed_when: hostvars['opnstk4']['scsiid2'] != hostvars['opnstk5']['scsiid2'] # simulate an error by hostvars['opnstk3']['scsiid2'][0:-2] != hostvars['opnstk4']['scsiid2']
+  when: "'opnstk4' in groups['data_nodes'] and 'opnstk5' in groups['data_nodes']"
+
+- name: check that all data nodes can see all available HDD devices - opnstk4, opnstk6
+  debug:
+  failed_when: hostvars['opnstk4']['scsiid2'] != hostvars['opnstk6']['scsiid2'] # simulate an error by hostvars['opnstk3']['scsiid2'][0:-2] != hostvars['opnstk4']['scsiid2']
+  when: "'opnstk4' in groups['data_nodes'] and 'opnstk6' in groups['data_nodes']"
+
+- name: check that all data nodes can see all available HDD devices - opnstk5, opnstk6
+  debug:
+  failed_when: hostvars['opnstk5']['scsiid2'] != hostvars['opnstk6']['scsiid2'] # simulate an error by hostvars['opnstk3']['scsiid2'][0:-2] != hostvars['opnstk4']['scsiid2']
+  when: "'opnstk5' in groups['data_nodes'] and 'opnstk6' in groups['data_nodes']"
