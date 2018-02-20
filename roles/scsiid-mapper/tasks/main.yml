@@ -1,0 +1,32 @@
+---
+# tasks file for scsiid-mapper
+
+- name: Map unique scsi-id to device names
+  script: ../../sbin/scsiid-mapper.py
+  register: mapper_output
+  when: inventory_hostname in groups['data_nodes']
+
+- set_fact: scsi={{ mapper_output.stdout_lines[1] }}
+  when: inventory_hostname in groups['data_nodes']
+
+- name: printing scsi
+  debug: var=scsi
+  when: inventory_hostname in groups['data_nodes']
+
+
+#- set_fact: scsiid2={% for item in hostvars['opnstk3'].scsi %}{{ item }},{% endfor %} # error! should be done to each one of the scsi variables
+- set_fact: scsiid2={% for item in scsi %}{{ item }},{% endfor %}  # do not specify hostvars['hostname..'].. this is needed to reference the variable from another role/task
+- name: print scsiid2..
+  debug: var=scsiid2
+  when: inventory_hostname in groups['data_nodes']
+
+
+- set_fact: scsiid2={{ scsiid2.split(',') }}
+  when: inventory_hostname in groups['data_nodes']
+
+- set_fact: scsiid2={{ scsiid2[0:-1] }}
+  when: inventory_hostname in groups['data_nodes']
+
+- name: print scsiid2.. converting to a string and trimming last void item (final list to have)
+  debug: var=scsiid2
+  when: inventory_hostname in groups['data_nodes']
