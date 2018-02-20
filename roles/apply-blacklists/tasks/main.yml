@@ -1,0 +1,393 @@
+---
+# tasks file for apply-blacklists
+
+- name: defining blacklist for opnstk3
+  lineinfile:
+    path: /etc/multipath.conf
+    state: present
+    insertafter: 'blacklist {'
+    line: "         wwid {{ item }}"
+  with_items:
+    - '{{ hostvars["localhost"]["blacklist_opnstk3"] |reverse|list }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk3"
+
+- name: defining blacklist for opnstk4
+  lineinfile:
+    path: /etc/multipath.conf
+    state: present
+    insertafter: 'blacklist {'
+    line: "         wwid {{ item }}"
+  with_items:
+    - '{{ hostvars["localhost"]["blacklist_opnstk4"] |reverse|list }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk4"
+
+- name: defining blacklist for opnstk5
+  lineinfile:
+    path: /etc/multipath.conf
+    state: present
+    insertafter: 'blacklist {'
+    line: "         wwid {{ item }}"
+  with_items:
+    - '{{ hostvars["localhost"]["blacklist_opnstk5"] |reverse|list }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk5"
+
+- name: defining blacklist for opnstk6
+  lineinfile:
+    path: /etc/multipath.conf
+    state: present
+    insertafter: 'blacklist {'
+    line: "         wwid {{ item }}"
+  with_items:
+    - '{{ hostvars["localhost"]["blacklist_opnstk6"] |reverse|list }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
+
+- name: stopping device mapper multipath service
+  service:
+    name: multipathd
+    state: stopped
+    enabled: yes
+  when: inventory_hostname in groups['data_nodes']
+
+- name: starting device mapper multipath service
+  service:
+    name: multipathd
+    state: started
+    enabled: yes
+  when: inventory_hostname in groups['data_nodes']
+
+- name: unmount volumes on opnstk3
+  shell: df -h | grep /dev/mapper | awk '{print $NF}' | xargs umount -f
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk3"
+  ignore_errors: yes
+
+- name: unmount volumes on opnstk4
+  shell: df -h | grep /dev/mapper | awk '{print $NF}' | xargs umount -f
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk4"
+  ignore_errors: yes
+
+- name: unmount volumes on opnstk5
+  shell: df -h | grep /dev/mapper | awk '{print $NF}' | xargs umount -f
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk5"
+  ignore_errors: yes
+
+- name: unmount volumes on opnstk6
+  shell: df -h | grep /dev/mapper | awk '{print $NF}' | xargs umount -f
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
+  ignore_errors: yes
+
+
+- name: eliminate old mount points on opnstk3
+  shell: rm -rf /{{hostvars['opnstk3']['mount_point_prefix']}}*
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk3"
+  ignore_errors: yes
+
+
+- name: eliminate old mount points on opnstk4
+  shell: rm -rf /{{hostvars['opnstk4']['mount_point_prefix']}}*
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk4"
+  ignore_errors: yes
+
+
+- name: eliminate old mount points on opnstk5
+  shell: rm -rf /{{hostvars['opnstk5']['mount_point_prefix']}}*
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk5"
+  ignore_errors: yes
+
+
+- name: eliminate old mount points on opnstk6
+  shell: rm -rf /{{hostvars['opnstk6']['mount_point_prefix']}}*
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
+  ignore_errors: yes
+
+
+- name: create mount points
+  shell: mkdir -p /{{item}}
+  with_items:
+    - '{{ hostvars["localhost"]["mount_points_opnstk3"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk3"
+
+- name: create mount points
+  shell: mkdir -p /{{item}}
+  with_items:
+    - '{{ hostvars["localhost"]["mount_points_opnstk4"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk4"
+
+- name: create mount points
+  shell: mkdir -p /{{item}}
+  with_items:
+    - '{{ hostvars["localhost"]["mount_points_opnstk5"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk5"
+
+- name: create mount points
+  shell: mkdir -p /{{item}}
+  with_items:
+    - '{{ hostvars["localhost"]["mount_points_opnstk6"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
+
+
+- name: Eliminate volumes partitions on opnstk3
+  shell: sgdisk --mbrtogpt --clear /dev/mapper/{{ hostvars["opnstk3"]["scsi"][item]["opnstk3.e4dot"][0] }}
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_opnstk3"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk3"
+
+- name: Eliminate volumes partitions on opnstk4
+  shell: sgdisk --mbrtogpt --clear /dev/mapper/{{ hostvars["opnstk4"]["scsi"][item]["opnstk4.e4dot"][0] }}
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_opnstk4"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk4"
+
+- name: Eliminate volumes partitions on opnstk5
+  shell: sgdisk --mbrtogpt --clear /dev/mapper/{{ hostvars["opnstk5"]["scsi"][item]["opnstk5.e4dot"][0] }}
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_opnstk5"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk5"
+
+- name: Eliminate volumes partitions on opnstk6
+  shell: sgdisk --mbrtogpt --clear /dev/mapper/{{ hostvars["opnstk6"]["scsi"][item]["opnstk6.e4dot"][0] }}
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_opnstk6"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
+
+
+- name: synching filesytem
+  command: sync
+
+- name: running multipath -F
+  command: multipath -F
+  ignore_errors: yes
+
+
+- name: stopping device mapper multipath service
+  service:
+    name: multipathd
+    state: stopped
+    enabled: yes
+  when: inventory_hostname in groups['data_nodes']
+
+- name: starting device mapper multipath service
+  service:
+    name: multipathd
+    state: started
+    enabled: yes
+  when: inventory_hostname in groups['data_nodes']
+
+
+
+- name: Formatting volumes partitions on opnstk3
+  shell: mkfs.xfs -f /dev/mapper/{{ hostvars["opnstk3"]["scsi"][item]["opnstk3.e4dot"][0] }}
+  async: 800
+  poll: 0
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_opnstk3"] }}'
+  register: opnstk3_formatting_result
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk3"
+
+- name: Formatting volumes partitions on opnstk4
+  shell: mkfs.xfs -f /dev/mapper/{{ hostvars["opnstk4"]["scsi"][item]["opnstk4.e4dot"][0] }}
+  async: 800
+  poll: 0
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_opnstk4"] }}'
+  register: opnstk4_formatting_result
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk4"
+
+- name: Formatting volumes partitions on opnstk5
+  shell: mkfs.xfs -f /dev/mapper/{{ hostvars["opnstk5"]["scsi"][item]["opnstk5.e4dot"][0] }}
+  async: 800
+  poll: 0
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_opnstk5"] }}'
+  register: opnstk5_formatting_result
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk5"
+
+- name: Formatting volumes partitions on opnstk6
+  shell: mkfs.xfs -f /dev/mapper/{{ hostvars["opnstk6"]["scsi"][item]["opnstk6.e4dot"][0] }}
+  async: 800
+  poll: 0
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_opnstk6"] }}'
+  register: opnstk6_formatting_result
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
+
+
+- name: printing opnstk3_formatting_result.results
+  debug: var=opnstk3_formatting_result.results
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk3"
+
+
+- name: printing opnstk4_formatting_result.results
+  debug: var=opnstk4_formatting_result.results
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk4"
+
+
+- name: printing opnstk5_formatting_result.results
+  debug: var=opnstk5_formatting_result.results
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk5"
+
+
+- name: printing opnstk6_formatting_result.results
+  debug: var=opnstk6_formatting_result.results
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
+
+
+- name: debug it.. opnstk3
+  debug:
+    msg: "item = {{ item }}"
+  with_items:
+    - "{{ opnstk3_formatting_result.results }}"
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk3"
+
+- name: debug it.. opnstk4
+  debug:
+    msg: "item = {{ item }}"
+  with_items: "{{ opnstk4_formatting_result.results }}"
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk4"
+
+
+- name: debug it.. opnstk5
+  debug:
+    msg: "item = {{ item.ansible_job_id }}"
+  with_items:
+    - "{{ opnstk5_formatting_result.results }}"
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk5"
+
+
+- name: debug it.. opnstk6
+  debug:
+    msg: "item = {{ item.ansible_job_id }}"
+  with_items: "{{ opnstk6_formatting_result.results }}"
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
+
+
+
+
+- name: check formatting tasks status - opnstk3
+  async_status: jid={{item.ansible_job_id}}
+  with_items: "{{ opnstk3_formatting_result.results }}"
+  register: async_poll_results
+  until: async_poll_results.finished
+  retries: 30
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk3"
+
+
+- name: check formatting tasks status - opnstk4
+  async_status: jid={{item.ansible_job_id}}
+  with_items: "{{ opnstk4_formatting_result.results }}"
+  register: async_poll_results
+  until: async_poll_results.finished
+  retries: 30
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk4"
+
+
+- name: check formatting tasks status - opnstk5
+  async_status: jid={{item.ansible_job_id}}
+  with_items:
+    - "{{ opnstk5_formatting_result.results }}"
+  register: async_poll_results
+  until: async_poll_results.finished
+  retries: 30
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk5"
+
+
+- name: check formatting tasks status - opnstk6
+  async_status: jid={{item.ansible_job_id}}
+  with_items:
+    - "{{ opnstk6_formatting_result.results }}"
+  register: async_poll_results
+  until: async_poll_results.finished
+  retries: 30
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
+
+
+- name: Mounting volumes partitions on opnstk3
+  command: mount /dev/mapper/{{ hostvars["opnstk3"]["scsi"][item.0]["opnstk3.e4dot"][0] }}  /{{ item.1 }}
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk3"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk3"
+
+- name: Mounting volumes partitions on opnstk4
+  command: mount /dev/mapper/{{ hostvars["opnstk4"]["scsi"][item.0]["opnstk4.e4dot"][0] }}  /{{ item.1 }}
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk4"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk4"
+
+
+- name: Mounting volumes partitions on opnstk5
+  command: mount /dev/mapper/{{ hostvars["opnstk5"]["scsi"][item.0]["opnstk5.e4dot"][0] }}  /{{ item.1 }}
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk5"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk5"
+
+
+- name: Mounting volumes partitions on opnstk6
+  command: mount /dev/mapper/{{ hostvars["opnstk6"]["scsi"][item.0]["opnstk6.e4dot"][0] }}  /{{ item.1 }}
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk6"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
+
+
+- name: Testing mounted volumes on opnstk3... touching a file
+  command: touch /{{ item.1 }}/opnstk3__{{ item.1 }}
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk3"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk3"
+
+- name: Testing mounted volumes on opnstk4... touching a file
+  command: touch /{{ item.1 }}/opnstk4__{{ item.1 }}
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk4"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk4"
+
+
+- name: Testing mounted volumes on opnstk5... touching a file
+  command: touch /{{ item.1 }}/opnstk5__{{ item.1 }}
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk5"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk5"
+
+
+- name: Testing mounted volumes on opnstk6... touching a file
+  command: touch /{{ item.1 }}/opnstk6__{{ item.1 }}
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk6"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
+
+
+- name: Testing mounted volumes on opnstk3... writing to a file
+  lineinfile:
+    path: /{{ item.1 }}/opnstk3__{{ item.1 }}
+    state: present
+    line: "opnstk3_{{ item.1 }}"
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk3"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk3"
+
+- name: Testing mounted volumes on opnstk4... writing to a file
+  lineinfile:
+    path: /{{ item.1 }}/opnstk4__{{ item.1 }}
+    state: present
+    line: "opnstk4_{{ item.1 }}"
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk4"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk4"
+
+
+- name: Testing mounted volumes on opnstk5... writing to a file
+  lineinfile:
+    path: /{{ item.1 }}/opnstk5__{{ item.1 }}
+    state: present
+    line: "opnstk5_{{ item.1 }}"
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk5"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk5"
+
+
+- name: Testing mounted volumes on opnstk6... writing to a file
+  lineinfile:
+    path: /{{ item.1 }}/opnstk6__{{ item.1 }}
+    state: present
+    line: "opnstk6_{{ item.1 }}"
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk6"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
