@@ -1,0 +1,15 @@
+---
+# tasks file for inststart-ntp
+- name: installing NTP
+  yum:
+    name: ntp
+    state: present
+  when: inventory_hostname in groups['all']
+
+
+- name: starting ntp service
+  service:
+    name: ntpd
+    state: started
+    enabled: yes
+  when: inventory_hostname in groups['all']
