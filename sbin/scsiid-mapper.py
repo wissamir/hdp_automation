@@ -134,55 +134,5 @@ from opnstk3
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-'''
-per il TdC
-il discorso delle blacklist pare funzionare...  qualche dubbio ancora sulla gestione delle partizioni per come vengono
-viste dal device mapper.. e questo mi lo chiarisco con Simone
-sto anche automatizzando la creazione delle blacklist nei vari nodi con un numero configurabile a piacimento dei dischi
-per ciascun nodo.. cosa essenziale per prove con HDP.. e questo automatismo consintera pure di testare al 100% tutti i device mappaer
-e tutti i mount point e accertare ceh le blacklist siano corrette.. che non ci sia una sovrapposizione
- - per il momento blacklist semplici statici e montando alcuni (non tutti) i device a mano in 2 dei nodi, pare funzionare.. quindi
- testato solo parzialmente
-
-'''
-
 if __name__ == "__main__":
-    # Note that it is not sufficient to call the target method (Mapper().get_map_dic()), but need also to output it to standard output (print Mapper().get_map_dic())
-    # in order to be able from the ansible controller machine to capture the output
-    # What you still need to understand is Local Facts! in https://www.safaribooksonline.com/library/view/ansible-up-and/9781491915318/ch04.html
-    # they state that one way to fix local facts is through An executable that takes no arguments and outputs JSON on standard out
-    # which lets think that from the ansible playbook side you do not need to register the output in order to get the new facts
-    #  You tried it.. (i.e just to print Mapper().get_map_json() here without registering the fact from the ansible playbook)
-    # but you did not get the new facts! So, anyway it seems to you you have to register the fact yourself!
-    # print Mapper().get_map_list()
     print Mapper().get_map_dic()
-    # print Mapper().get_map_json()
-
-    # If you want to get rid from the print and just return values and get them recognized as ansible facts, the way to go
-    # seems to be is to transform this script into ansible module, then to return a dictionary that contains ansible_facts
-    # as a key! see https://www.safaribooksonline.com/library/view/ansible-up-and/9781491915318/ch04.html#setup_module_output
-    # Any Module Can Return Facts.. ansible facts in the return value is an ansible idiom! if a module returns a dictionary that contains
-    # ansible_facts as a key, then ansible will create a variable names in the environment with thous values and associate
-    # them with the active host.. for modules that return facts, there is no need to register variables, since ansible will
-    # create these variables for you automatically
