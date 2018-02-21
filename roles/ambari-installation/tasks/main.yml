@@ -1,0 +1,14 @@
+---
+# tasks file for ambari-installation
+
+- name: Download Ambari repository
+#  shell: wget -nv http://public-repo-1.hortonworks.com/ambari/centos7/2.x/updates/2.6.1.0/ambari.repo -O /etc/yum.repos.d/ambari.repo
+  get_url:
+    url: http://public-repo-1.hortonworks.com/ambari/centos7/2.x/updates/2.6.1.0/ambari.repo
+    dest: /etc/yum.repos.d/
+  when: inventory_hostname in groups['name_nodes']  # but in mainpl.yml you're limiting the execution for the moment to only opnstk1
+
+
+- name: Download Ambari repository
+  shell: yum repolist | grep ambari  # will result in $? not 0 (thus en error code) if ambari is not installed and will fail the task
+  when: inventory_hostname in groups['name_nodes']  # but in mainpl.yml you're limiting the execution for the moment to only opnstk1
