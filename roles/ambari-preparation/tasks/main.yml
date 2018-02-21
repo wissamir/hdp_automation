@@ -22,3 +22,40 @@
     state: stopped
     enabled: no
   when: inventory_hostname in groups['all']
+
+
+- name: Disabling SELinux
+  shell: setenforce 0
+  when: inventory_hostname in groups['all']
+  ignore_errors: yes  # if SELinux is already disabled, the setenforce command returns rc not 0
+
+
+- name: Disabling SELinux permanently... editing /etc/selinux/config to remove SELINUX=enabled
+  lineinfile:
+    path: /etc/selinux/config
+    state: absent
+    line: "SELINUX=enabled"
+  when: inventory_hostname in groups['all']
+
+
+- name: Disabling SELinux permanently... editing /etc/selinux/config to add SELINUX=disabled
+  lineinfile:
+    path: /etc/selinux/config
+    state: present
+    insertbefore: 'SELINUXTYPE='
+    line: "SELINUX=disabled"
+  when: inventory_hostname in groups['all']
+
+
+- name: Setting UMASK value to 0022 for current session (read,write,exeucte permissions of 755)
+  shell: umask 0022
+  when: inventory_hostname in groups['all']
+  ignore_errors: yes
+
+
+- name: Setting UMASK value to 0022 permanently
+  lineinfile:
+    path: /etc/profile
+    state: present
+    line: "umask 0022"
+  when: inventory_hostname in groups['all']
