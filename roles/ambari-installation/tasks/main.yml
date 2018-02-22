@@ -1,6 +1,30 @@
 ---
 # tasks file for ambari-installation
 
+# TODOs: the following are tasks to install Ambari.. put them in one role "ambari-installation"
+# 1. Download the Ambari repository - DONE
+# 2. Install the Ambari server - DONE
+# 3. Setup the Ambari server - see if you need to change either configuration (think no!) from https://docs.hortonworks.com/HDPDocuments/Ambari-2.6.1.0/bk_ambari-installation/content/setup_options.
+#   Run at least 'ambari-server setup' for the first time to create user/db...etc
+#   There are lot of options out there! see what is useful for your case and automate this
+#   For the time being, you have a task Setting up Ambari server and use "ambari-server setup --silent"  --> it will accept all defaults (during this step Oracle JDK 1.8 will be downloaded and installed)
+#       ...... Ambari Server 'setup' completed successfully. --- DONE
+# 4. Working with Management Packs - see if it beneficial! https://docs.hortonworks.com/HDPDocuments/Ambari-2.6.1.0/bk_ambari-installation/content/ch_working-with-mpacks.html
+# 5. Once Ambari is installed, proceed to install the cluster!
+#    - https://docs.hortonworks.com/HDPDocuments/HDP2/HDP-2.6.4/index.html
+#    - https://docs.hortonworks.com/HDPDocuments/HDP2/HDP-2.6.4/bk_cluster-planning/bk_cluster-planning.pdf
+#    - see if partition numbering for HDFS must start from 0 (/grid/0) or can be started also from 1 (/grid/1)
+# 6. Configurations - lot of configuration options during HDP installation
+#    - How to divide master services / slave services between nodes / configuration parameters
+#    - How to install Ambari in HA
+#    - How to test name-nodes HA/ journaling / zookeeper
+# For example:
+#         The following configuration changes are highly recommended, but can be skipped.
+#         Type	Service	Property	Value	Description
+#         Warning	Atlas	atlas.graph.storage.hostname	opnstk3.e4dot,opnstk2.e4dot,opnstk1.e4dot
+#         Atlas is configured to use the HBase installed in this cluster. If you would like Atlas to use another HBase instance,
+#         please configure this property and HBASE_CONF_DIR variable in atlas-env appropriately.
+
 - name: Download Ambari repository
 #  shell: wget -nv http://public-repo-1.hortonworks.com/ambari/centos7/2.x/updates/2.6.1.0/ambari.repo -O /etc/yum.repos.d/ambari.repo
   get_url:
@@ -26,6 +50,6 @@
   when: inventory_hostname in groups['all']
 
 
-- name: Starting the Ambari Server
+- name: Starting the Ambari Server  # then ssh -t -L8000:localhost:8080 root@opnstk1 -Nv and point your browser to localhost:8000
   shell: ambari-server start
   when: inventory_hostname in groups['all']
