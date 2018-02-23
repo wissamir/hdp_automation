@@ -1,8 +1,8 @@
 # corner case.. first list is empty [] ??? does it treat it?
 
 - set_fact: current_node={{ groups["data_nodes"][i|int] }}
-- name: printing mount point prefix
-  debug: var={{ hostvars['%s'|format(current_node)]["mount_point_prefix"]}}
+#- name: printing mount point prefix
+#  debug: var={{ hostvars['%s'|format(current_node)]["mount_point_prefix"]}}
 
 - name: printing current node
   debug: var=current_node
@@ -29,7 +29,8 @@
   set_fact: blacklist_{{current_node}}={{ hostvars['localhost']['scsiid2'] | difference(hostvars['localhost']['scsiid_%s'|format(current_node)]) }}
 
 
-- set_fact: mount_points_{{current_node}}={% for item in range(1, hostvars['localhost']['scsiid_%s'|format(current_node)]|length + 1) %}{{hostvars['%s'|format(current_node)]["mount_point_prefix"]}}{{item}},{% endfor %}
+#- set_fact: mount_points_{{current_node}}={% for item in range(1, hostvars['localhost']['scsiid_%s'|format(current_node)]|length + 1) %}{{hostvars['%s'|format(current_node)]["mount_point_prefix"]}}{{item}},{% endfor %}
+- set_fact: mount_points_{{current_node}}={% for item in range(0, hostvars['localhost']['scsiid_%s'|format(current_node)]|length) %}{{hostvars['%s'|format(current_node)]["mount_point_prefix"]}}{{item}},{% endfor %}
 - set_fact: mount_points_{{current_node}}={{ hostvars['localhost']['mount_points_%s'|format(current_node)].split(",") }}
 - set_fact: mount_points_{{current_node}}={{ hostvars['localhost']['mount_points_%s'|format(current_node)][0:-1] }}
 
