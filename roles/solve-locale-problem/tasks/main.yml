@@ -9,11 +9,18 @@
     mode: 0644
   when: inventory_hostname in groups['all']
 
-- name: copy environment file to solve the problem "warning: setlocale: LC_CTYPE/LC_COLLATE/LC_MESSAGES/LC_NUMERIC/LC_TIME: cannot change locale (UTF-8): No such file or directory" # https://github.com/CentOS/sig-cloud-instance-images/issues/71 and https://gist.github.com/thanksdanny/332ca54e46bf96a569ce5d292be52200
+- name: copy environment file to solve the problem "warning setlocale LC_CTYPE/LC_COLLATE/LC_MESSAGES/LC_NUMERIC/LC_TIME cannot change locale (UTF-8) No such file or directory" # https://github.com/CentOS/sig-cloud-instance-images/issues/71 and https://gist.github.com/thanksdanny/332ca54e46bf96a569ce5d292be52200
   copy:
     src: ../../conf/environment
     dest: /etc/environment
     owner: root
     group: root
     mode: 0644
+  when: inventory_hostname in groups['all']
+
+- name: adding localedef -i en_US -f UTF-8 en_US.UTF-8 to .bashrc
+  lineinfile:
+    path: /root/.bashrc
+    state: present
+    line: "localedef -i en_US -f UTF-8 en_US.UTF-8"
   when: inventory_hostname in groups['all']
