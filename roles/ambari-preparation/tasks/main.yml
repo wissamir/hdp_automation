@@ -90,13 +90,3 @@
     state: present
     line: "umask 0022"
   when: inventory_hostname in groups['all']
-
-
-- name: copy my-custom.lang.sh to solve the problem Failed to set locale, defaulting to C # https://www.cyberciti.biz/faq/failed-to-set-locale-defaulting-to-c-warning-message-on-centoslinux/
-  copy:
-    src: ../../conf/my-custom.lang.sh
-    dest: /etc/profile.d/my-custom.lang.sh
-    owner: root
-    group: root
-    mode: 0644
-  when: inventory_hostname in groups['all']
