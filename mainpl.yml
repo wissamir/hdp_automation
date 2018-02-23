@@ -43,3 +43,14 @@
   hosts: localhost
   roles:
     - healthcheck3-md5sum
+
+
+- name: Prepare the cluster to install Ambari
+  hosts: all
+  roles:
+    - ambari-preparation
+
+- name: Install Ambari on one node
+  hosts: opnstk1
+  roles:
+    - ambari-installation
