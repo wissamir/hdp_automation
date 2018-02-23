@@ -1,7 +1,7 @@
 ---
 # tasks file for hdp-cleanup
 
-- name: Map unique scsi-id to device names
+- name: Removing HDP components...
   script: ../../sbin/cleanup.sh
   when: inventory_hostname in groups['all']
   ignore_errors: yes
