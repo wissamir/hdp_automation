@@ -1,3 +1,8 @@
+- name: Solve the locale problem first
+  hosts: all
+  roles:
+    - solve-locale-problem
+
 - name: Install device mapper multipath and start services
   hosts: opnstk3, opnstk4, opnstk5, opnstk6
   roles:
