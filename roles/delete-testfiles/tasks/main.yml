@@ -1,0 +1,32 @@
+---
+# tasks file for delete-testfiles
+
+- name: Deleting test files on opnstk3
+#  command: rm -rf  /grid/{{ item.1 }}/*   # strange enough.. this does not delete files
+  shell: rm -rf  /grid/{{ item.1 }}/*      # using shell module rather than command does the job
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk3"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk3"
+
+- name: Deleting test files on opnstk4
+#  command: rm -rf  /grid/{{ item.1 }}/*   # strange enough.. this does not delete files
+  shell: rm -rf  /grid/{{ item.1 }}/*      # using shell module rather than command does the job
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk4"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk4"
+
+
+- name: Deleting test files on opnstk5
+#  command: rm -rf  /grid/{{ item.1 }}/*   # strange enough.. this does not delete files
+  shell: rm -rf  /grid/{{ item.1 }}/*      # using shell module rather than command does the job
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk5"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk5"
+
+
+- name: Deleting test files on opnstk6
+#  command: rm -rf  /grid/{{ item.1 }}/*   # strange enough.. this does not delete files
+  shell: rm -rf  /grid/{{ item.1 }}/*      # using shell module rather than command does the job
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk6"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
