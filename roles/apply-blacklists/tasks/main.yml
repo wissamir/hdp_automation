@@ -77,49 +77,57 @@
 
 
 - name: eliminate old mount points on opnstk3
-  shell: rm -rf /{{hostvars['opnstk3']['mount_point_prefix']}}*
+#  shell: rm -rf /{{hostvars['opnstk3']['mount_point_prefix']}}*
+  shell: rm -rf /grid
   when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk3"
   ignore_errors: yes
 
 
 - name: eliminate old mount points on opnstk4
-  shell: rm -rf /{{hostvars['opnstk4']['mount_point_prefix']}}*
+#  shell: rm -rf /{{hostvars['opnstk4']['mount_point_prefix']}}*
+  shell: rm -rf /grid
   when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk4"
   ignore_errors: yes
 
 
 - name: eliminate old mount points on opnstk5
-  shell: rm -rf /{{hostvars['opnstk5']['mount_point_prefix']}}*
+#  shell: rm -rf /{{hostvars['opnstk5']['mount_point_prefix']}}*
+  shell: rm -rf /grid
   when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk5"
   ignore_errors: yes
 
 
 - name: eliminate old mount points on opnstk6
-  shell: rm -rf /{{hostvars['opnstk6']['mount_point_prefix']}}*
+#  shell: rm -rf /{{hostvars['opnstk6']['mount_point_prefix']}}*
+  shell: rm -rf /grid
   when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
   ignore_errors: yes
 
 
 - name: create mount points
-  shell: mkdir -p /{{item}}
+#  shell: mkdir -p /{{item}}
+  shell: mkdir -p /grid/{{item}}
   with_items:
     - '{{ hostvars["localhost"]["mount_points_opnstk3"] }}'
   when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk3"
 
 - name: create mount points
-  shell: mkdir -p /{{item}}
+#  shell: mkdir -p /{{item}}
+  shell: mkdir -p /grid/{{item}}
   with_items:
     - '{{ hostvars["localhost"]["mount_points_opnstk4"] }}'
   when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk4"
 
 - name: create mount points
-  shell: mkdir -p /{{item}}
+#  shell: mkdir -p /{{item}}
+  shell: mkdir -p /grid/{{item}}
   with_items:
     - '{{ hostvars["localhost"]["mount_points_opnstk5"] }}'
   when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk5"
 
 - name: create mount points
-  shell: mkdir -p /{{item}}
+#  shell: mkdir -p /{{item}}
+  shell: mkdir -p /grid/{{item}}
   with_items:
     - '{{ hostvars["localhost"]["mount_points_opnstk6"] }}'
   when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
@@ -301,54 +309,62 @@
 
 
 - name: Mounting volumes partitions on opnstk3
-  command: mount /dev/mapper/{{ hostvars["opnstk3"]["scsi"][item.0]["opnstk3.e4dot"][0] }}  /{{ item.1 }}
+#  command: mount /dev/mapper/{{ hostvars["opnstk3"]["scsi"][item.0]["opnstk3.e4dot"][0] }}  /{{ item.1 }}
+  command: mount /dev/mapper/{{ hostvars["opnstk3"]["scsi"][item.0]["opnstk3.e4dot"][0] }}  /grid/{{ item.1 }}
   with_items:
     - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk3"] }}'
   when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk3"
 
 - name: Mounting volumes partitions on opnstk4
-  command: mount /dev/mapper/{{ hostvars["opnstk4"]["scsi"][item.0]["opnstk4.e4dot"][0] }}  /{{ item.1 }}
+#  command: mount /dev/mapper/{{ hostvars["opnstk4"]["scsi"][item.0]["opnstk4.e4dot"][0] }}  /{{ item.1 }}
+  command: mount /dev/mapper/{{ hostvars["opnstk4"]["scsi"][item.0]["opnstk4.e4dot"][0] }}  /grid/{{ item.1 }}
   with_items:
     - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk4"] }}'
   when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk4"
 
 
 - name: Mounting volumes partitions on opnstk5
-  command: mount /dev/mapper/{{ hostvars["opnstk5"]["scsi"][item.0]["opnstk5.e4dot"][0] }}  /{{ item.1 }}
+#  command: mount /dev/mapper/{{ hostvars["opnstk5"]["scsi"][item.0]["opnstk5.e4dot"][0] }}  /{{ item.1 }}
+  command: mount /dev/mapper/{{ hostvars["opnstk5"]["scsi"][item.0]["opnstk5.e4dot"][0] }}  /grid/{{ item.1 }}
   with_items:
     - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk5"] }}'
   when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk5"
 
 
 - name: Mounting volumes partitions on opnstk6
-  command: mount /dev/mapper/{{ hostvars["opnstk6"]["scsi"][item.0]["opnstk6.e4dot"][0] }}  /{{ item.1 }}
+#  command: mount /dev/mapper/{{ hostvars["opnstk6"]["scsi"][item.0]["opnstk6.e4dot"][0] }}  /{{ item.1 }}
+  command: mount /dev/mapper/{{ hostvars["opnstk6"]["scsi"][item.0]["opnstk6.e4dot"][0] }}  /grid/{{ item.1 }}
   with_items:
     - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk6"] }}'
   when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
 
 
 - name: Testing mounted volumes on opnstk3... touching a file
-  command: touch /{{ item.1 }}/opnstk3__{{ item.1 }}
+#  command: touch /{{ item.1 }}/opnstk3__{{ item.1 }}
+  command: touch /grid/{{ item.1 }}/opnstk3__{{ item.1 }}
   with_items:
     - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk3"] }}'
   when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk3"
 
 - name: Testing mounted volumes on opnstk4... touching a file
-  command: touch /{{ item.1 }}/opnstk4__{{ item.1 }}
+#  command: touch /{{ item.1 }}/opnstk4__{{ item.1 }}
+  command: touch /grid/{{ item.1 }}/opnstk4__{{ item.1 }}
   with_items:
     - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk4"] }}'
   when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk4"
 
 
 - name: Testing mounted volumes on opnstk5... touching a file
-  command: touch /{{ item.1 }}/opnstk5__{{ item.1 }}
+#  command: touch /{{ item.1 }}/opnstk5__{{ item.1 }}
+  command: touch /grid/{{ item.1 }}/opnstk5__{{ item.1 }}
   with_items:
     - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk5"] }}'
   when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk5"
 
 
 - name: Testing mounted volumes on opnstk6... touching a file
-  command: touch /{{ item.1 }}/opnstk6__{{ item.1 }}
+#  command: touch /{{ item.1 }}/opnstk6__{{ item.1 }}
+  command: touch /grid/{{ item.1 }}/opnstk6__{{ item.1 }}
   with_items:
     - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk6"] }}'
   when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
@@ -356,7 +372,8 @@
 
 - name: Testing mounted volumes on opnstk3... writing to a file
   lineinfile:
-    path: /{{ item.1 }}/opnstk3__{{ item.1 }}
+#    path: /{{ item.1 }}/opnstk3__{{ item.1 }}
+    path: /grid/{{ item.1 }}/opnstk3__{{ item.1 }}
     state: present
     line: "opnstk3_{{ item.1 }}"
   with_items:
@@ -365,7 +382,8 @@
 
 - name: Testing mounted volumes on opnstk4... writing to a file
   lineinfile:
-    path: /{{ item.1 }}/opnstk4__{{ item.1 }}
+#    path: /{{ item.1 }}/opnstk4__{{ item.1 }}
+    path: /grid/{{ item.1 }}/opnstk4__{{ item.1 }}
     state: present
     line: "opnstk4_{{ item.1 }}"
   with_items:
@@ -375,7 +393,8 @@
 
 - name: Testing mounted volumes on opnstk5... writing to a file
   lineinfile:
-    path: /{{ item.1 }}/opnstk5__{{ item.1 }}
+#    path: /{{ item.1 }}/opnstk5__{{ item.1 }}
+    path: /grid/{{ item.1 }}/opnstk5__{{ item.1 }}
     state: present
     line: "opnstk5_{{ item.1 }}"
   with_items:
@@ -385,7 +404,8 @@
 
 - name: Testing mounted volumes on opnstk6... writing to a file
   lineinfile:
-    path: /{{ item.1 }}/opnstk6__{{ item.1 }}
+#    path: /{{ item.1 }}/opnstk6__{{ item.1 }}
+    path: /grid/{{ item.1 }}/opnstk6__{{ item.1 }}
     state: present
     line: "opnstk6_{{ item.1 }}"
   with_items:
