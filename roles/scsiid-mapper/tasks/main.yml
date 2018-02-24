@@ -6,7 +6,27 @@
   register: mapper_output
   when: inventory_hostname in groups['data_nodes']
 
-- set_fact: scsi={{ mapper_output.stdout_lines[1] }}
+
+- name: print mapper_output..
+  debug: var=mapper_output
+  when: inventory_hostname in groups['data_nodes']
+
+
+# Before stdout_line of mapper_out had the form:
+#        "stdout_lines": [
+#            "/etc/profile.d/lang.sh: line 19: warning: setlocale: LC_CTYPE: cannot change locale (UTF-8): No such file or directory",
+#            "[['35000c50062815bb3', 'mpathr', ['sdab', 'sdal']], ['35000c5007f578bd7', 'mpathe', ['sdu', 'sdj']], ['35000c50062815d6f', 'mpathq', ['sdz', 'sdag']], ['35000cca01a9ae9b4', 'mpathd', ['sdt', 'sdd']], ['35000c50063735907', 'mpathp', ['sdr', 'sdbh']], ['35000cca01a9a9c18', 'mpathc', ['sds', 'sdbi']], ['35000cca01a4deb00', 'mpathah', ['sdg', 'sdau']], ['35000cca01a3f71d0', 'mpatho', ['sdq', 'sdbf']], ['35000cca01a4deafc', 'mpathb', ['sdh', 'sdaw']], ['35000cca01a4df76c', 'mpathag', ['sdf', 'sdat']], ['35000cca01a9aec88', 'mpathn', ['sdo', 'sdbe']], ['35000cca01a9ae97c', 'mpatha', ['sdb', 'sday']], ['35000cca01a4dfad4', 'mpathz', ['sdaf', 'sdbg']], ['35000cca01a9a6584', 'mpathaf', ['sde', 'sdas']], ['35000cca01a9a9c3c', 'mpathm', ['sdn', 'sdbd']], ['35000c50062806a63', 'mpathy', ['sdae', 'sdba']], ['35000cca01a9a2260', 'mpathae', ['sdc', 'sdar']], ['35000cca01a4dfad0', 'mpathl', ['sdm', 'sdbc']], ['35000cca01a4e89c4', 'mpathx', ['sdad', 'sdav']], ['35000cca01a4debc0', 'mpathad', ['sdak', 'sdbm']], ['35000cca01a4e7360', 'mpathk', ['sdl', 'sdbb']], ['35000cca01a9a2c44', 'mpathw', ['sdac', 'sdaq']], ['35000cca01a4dfa38', 'mpathac', ['sdaj', 'sdbl']], ['35000cca01a9acc7c', 'mpathj', ['sdk', 'sdaz']], ['35000cca01a9a1a00', 'mpathv', ['sdap', 'sdbq']], ['35000c50062806bbb', 'mpathab', ['sdai', 'sdbk']], ['35000cca01a4e86b0', 'mpathi', ['sdi', 'sdax']], ['35000cca01a4e72b8', 'mpathu', ['sdao', 'sdbp']], ['35000c50062800e7b', 'mpathh', ['sdy', 'sdaa']], ['35000cca01a4dcf2c', 'mpathaa', ['sdah', 'sdbj']], ['35000cca01a9acc80', 'mpatht', ['sdan', 'sdbo']], ['35000cca01a4dfae4', 'mpathg', ['sdx', 'sdv']], ['35000cca01a4e875c', 'mpaths', ['sdam', 'sdbn']], ['35000cca01a4e7710', 'mpathf', ['sdw', 'sdp']]]"
+#        ]
+
+#
+#Now the entry that interests you is at the first index (0)
+#"stdout_lines": [
+#            "{'35000cca01a9ae97c': {'opnstk6.e4dot': ['mpatha', ['sda', 'sdao']]}, '35000cca01a4dfa38': {'opnstk6.e4dot': ['mpathac', ['sdac', 'sdbk']]}, '35000cca01a4e89c4': {'opnstk6.e4dot': ['mpathx', ['sdx', 'sdbf']]}, '35000cca01a3f71d0': {'opnstk6.e4dot': ['mpatho', ['sdm', 'sdau']]}, '35000cca01a9a9c3c': {'opnstk6.e4dot': ['mpathm', ['sdk', 'sdas']]}, '35000cca01a4dfad0': {'opnstk6.e4dot': ['mpathl', ['sdj', 'sdar']]}, '35000cca01a4df76c': {'opnstk6.e4dot': ['mpathag', ['sdd', 'sdak']]}, '35000c50063735907': {'opnstk6.e4dot': ['mpathp', ['sdn', 'sdav']]}, '35000cca01a9a2260': {'opnstk6.e4dot': ['mpathae', ['sdb', 'sdai']]}, '35000c5007f578bd7': {'opnstk6.e4dot': ['mpathe', ['sdq', 'sday']]}, '35000c50062806a63': {'opnstk6.e4dot': ['mpathy', ['sdy', 'sdbg']]}}"
+#        ]
+#
+#Since you run as ever first task in the first play book, the solve-locale-problem role that should resolve the local problem
+
+- set_fact: scsi={{ mapper_output.stdout_lines[0] }}
   when: inventory_hostname in groups['data_nodes']
 
 - name: printing scsi
