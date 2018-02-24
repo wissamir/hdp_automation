@@ -62,7 +62,12 @@
   register: md5sums
   when: inventory_hostname in groups['data_nodes']
 
-- set_fact: md5sums={{ md5sums.stdout_lines[1] }}
+- name: printing md5sums
+  debug: var=md5sums
+  when: inventory_hostname in groups['data_nodes']
+
+
+- set_fact: md5sums={{ md5sums.stdout_lines[0] }}
   when: inventory_hostname in groups['data_nodes']
 
 - name: printing md5sums
