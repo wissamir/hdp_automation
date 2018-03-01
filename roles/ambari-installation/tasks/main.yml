@@ -42,7 +42,7 @@
   yum:
     name: ambari-server
     state: present
-  when: inventory_hostname in groups['name_nodes'] # but in mainpl.yml you're limiting the execution for the moment to only opnstk1
+  when: inventory_hostname in groups['name_nodes'] and inventory_hostname == "opnstk1" # but in mainpl.yml you're limiting the execution for the moment to only opnstk1
 
 
 - name: copy MySQL JDBC driver in case you want to use it for Ambari/Hive/Oozie
@@ -51,7 +51,7 @@
     dest: /root/mysql-connector-java-5.1.45.jar
     owner: root
     group: root
-  when: inventory_hostname in groups['data_nodes']
+  when: inventory_hostname in groups['data_nodes'] and inventory_hostname == "opnstk1"
 
 - name: copy PostgreSQL JDBC driver in case you want to use it for Ambari/Hive/Oozie
   copy:
@@ -59,14 +59,14 @@
     dest: /root/postgresql-42.2.1.jar
     owner: root
     group: root
-  when: inventory_hostname in groups['data_nodes']
+  when: inventory_hostname in groups['data_nodes'] and inventory_hostname == "opnstk1"
 
 
 - name: Setting up Ambari Server with default values
   shell: ambari-server setup --silent
-  when: inventory_hostname in groups['all']
+  when: inventory_hostname in groups['all'] and inventory_hostname == "opnstk1"
 
 
 - name: Starting the Ambari Server  # then ssh -t -L8000:localhost:8080 root@opnstk1 -Nv and point your browser to localhost:8000
   shell: ambari-server start
-  when: inventory_hostname in groups['all']
+  when: inventory_hostname in groups['all'] and inventory_hostname == "opnstk1"
