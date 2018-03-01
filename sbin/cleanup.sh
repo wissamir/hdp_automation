@@ -1,11 +1,16 @@
 #!/bin/bash
+# @author: wissamabuahmad
 # Reference: https://community.hortonworks.com/articles/97489/completely-uninstall-hdp-and-ambari.html
 
 # Stop all services in Ambari or kill them.
 ps fax | grep hdfs | awk '{print $1}' | xargs kill -9
 
 # Run python script on all cluster nodes
+# Note: Clean up of Firewall and Transparent Huge Page issues are not supported by the HostCleanup script.
+# Note: To clean up in interactive mode, remove --silent option. To clean up all resources, including users, remove --skip=users option. Use --help for a list of available options.
+
 python /usr/lib/python2.6/site-packages/ambari_agent/HostCleanup.py --silent --skip=users
+
 
 # Remove Hadoop packages on all nodes
 yum remove -y hive\*
@@ -26,6 +31,12 @@ yum remove -y ambari-metrics-monitor
 yum remove -y spark2_2_5_3_0_37-yarn-shuffle
 yum remove -y spark_2_5_3_0_37-yarn-shuffle
 yum remove -y ambari-infra-solr-client
+yum remove -y bigtop-tomcat
+yum remove -y spark_llap_*
+yum remove -y spark_llap_2_6_4_0_91.noarch
+yum remove -y druid_*
+yum remove -y bigtop-jsvc
+yum remove -y shc_*
 
 # Remove ambari-server (on ambari host) and ambari-agent (on all nodes) - if run with ansible, remember to add ignore_errors as ambari-server does exist on datanodes
 ambari-server stop
@@ -228,6 +239,8 @@ userdel -r tez
 userdel -r yarn
 userdel -r zeppelin
 userdel -r zookeeper
+userdel -r atlas
+userdel -r mahout
 
 # Run find / -name ** on all nodes. You will definitely find several more files/folders. Remove them.
 find / -name "*ambari*" | xargs rm -rf
