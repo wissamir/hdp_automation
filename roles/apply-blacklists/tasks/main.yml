@@ -103,6 +103,13 @@
   when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
   ignore_errors: yes
 
+- name: Eliminate mounting script
+  file:
+    path: /root/mountfs.sh
+    state: absent
+  when: inventory_hostname in groups["data_nodes"]
+  ignore_errors: yes # in case already removed
+
 
 - name: create mount points
 #  shell: mkdir -p /{{item}}
@@ -334,6 +341,62 @@
 - name: Mounting volumes partitions on opnstk6
 #  command: mount /dev/mapper/{{ hostvars["opnstk6"]["scsi"][item.0]["opnstk6.e4dot"][0] }}  /{{ item.1 }}
   command: mount /dev/mapper/{{ hostvars["opnstk6"]["scsi"][item.0]["opnstk6.e4dot"][0] }}  /grid/{{ item.1 }}
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk6"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
+
+
+- name: Writing mounting script on datanodes -- 1
+  file:
+    path: /root/mountfs.sh
+    state: touch
+    mode: 0777
+  when: inventory_hostname in groups["data_nodes"]
+
+
+- name: Writing mounting script on datanodes -- 2
+  lineinfile:
+    path: /root/mountfs.sh
+    state: present
+    line: "#!/bin/bash"
+  when: inventory_hostname in groups["data_nodes"]
+
+
+- name: Writing mounting script on opnstk3
+  lineinfile:
+    path: /root/mountfs.sh
+    state: present
+    line: 'mount /dev/mapper/{{ hostvars["opnstk3"]["scsi"][item.0]["opnstk3.e4dot"][0] }}  /grid/{{ item.1 }}'
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk3"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk3"
+
+
+- name: Writing mounting script on opnstk4
+  lineinfile:
+    path: /root/mountfs.sh
+    state: present
+    line: 'mount /dev/mapper/{{ hostvars["opnstk4"]["scsi"][item.0]["opnstk4.e4dot"][0] }}  /grid/{{ item.1 }}'
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk4"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk4"
+
+
+- name: Writing mounting script on opnstk5
+  lineinfile:
+    path: /root/mountfs.sh
+    state: present
+    line: 'mount /dev/mapper/{{ hostvars["opnstk5"]["scsi"][item.0]["opnstk5.e4dot"][0] }}  /grid/{{ item.1 }}'
+  with_items:
+    - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk5"] }}'
+  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk5"
+
+
+- name: Writing mounting script on opnstk6
+  lineinfile:
+    path: /root/mountfs.sh
+    state: present
+    line: 'mount /dev/mapper/{{ hostvars["opnstk6"]["scsi"][item.0]["opnstk6.e4dot"][0] }}  /grid/{{ item.1 }}'
   with_items:
     - '{{ hostvars["localhost"]["scsiid_mount_points_opnstk6"] }}'
   when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
