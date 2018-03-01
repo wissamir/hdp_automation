@@ -76,32 +76,39 @@
   ignore_errors: yes
 
 
-- name: eliminate old mount points on opnstk3
-#  shell: rm -rf /{{hostvars['opnstk3']['mount_point_prefix']}}*
-  shell: rm -rf /grid
-  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk3"
-  ignore_errors: yes
+#- name: eliminate old mount points on opnstk3
+##  shell: rm -rf /{{hostvars['opnstk3']['mount_point_prefix']}}*
+#  shell: rm -rf /grid
+#  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk3"
+#  ignore_errors: yes
+#
+#
+#- name: eliminate old mount points on opnstk4
+##  shell: rm -rf /{{hostvars['opnstk4']['mount_point_prefix']}}*
+#  shell: rm -rf /grid
+#  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk4"
+#  ignore_errors: yes
+#
+#
+#- name: eliminate old mount points on opnstk5
+##  shell: rm -rf /{{hostvars['opnstk5']['mount_point_prefix']}}*
+#  shell: rm -rf /grid
+#  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk5"
+#  ignore_errors: yes
+#
+#
+#- name: eliminate old mount points on opnstk6
+##  shell: rm -rf /{{hostvars['opnstk6']['mount_point_prefix']}}*
+#  shell: rm -rf /grid
+#  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
+#  ignore_errors: yes
 
-
-- name: eliminate old mount points on opnstk4
-#  shell: rm -rf /{{hostvars['opnstk4']['mount_point_prefix']}}*
-  shell: rm -rf /grid
-  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk4"
-  ignore_errors: yes
-
-
-- name: eliminate old mount points on opnstk5
-#  shell: rm -rf /{{hostvars['opnstk5']['mount_point_prefix']}}*
-  shell: rm -rf /grid
-  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk5"
-  ignore_errors: yes
-
-
-- name: eliminate old mount points on opnstk6
-#  shell: rm -rf /{{hostvars['opnstk6']['mount_point_prefix']}}*
-  shell: rm -rf /grid
-  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
-  ignore_errors: yes
+- name: Eliminate old mount points
+  file:
+    path: /grid
+    state: absent
+  when: inventory_hostname in groups["data_nodes"]
+  ignore_errors: yes  # in case already removed
 
 - name: Eliminate mounting script
   file:
