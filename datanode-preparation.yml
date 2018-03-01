@@ -31,6 +31,11 @@
     - healthcheck2-scsiid-mappings
 
 
+#- name: writing mounting script
+#  hosts: data_nodes
+#  roles:
+#    - testing-stuff
+
 - name: Apply blacklists..
   hosts: opnstk3, opnstk4, opnstk5, opnstk6
   roles:
