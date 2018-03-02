@@ -4,4 +4,4 @@
 - name: Removing HDP components...
   script: ../../sbin/cleanup.sh
   when: inventory_hostname in groups['all']
-  ignore_errors: yes
+  ignore_errors: yes  # to avoid task failure due to rc!=0 of one of the commands in sbin/cleanup.sh (package to remove is already removed, user to delete is already deleted)
