@@ -51,7 +51,7 @@
     dest: /root/mysql-connector-java-5.1.45.jar
     owner: root
     group: root
-  when: inventory_hostname in groups['data_nodes'] and inventory_hostname == "opnstk1"
+  when: inventory_hostname in groups['name_nodes'] and inventory_hostname == "opnstk1"
 
 - name: copy PostgreSQL JDBC driver in case you want to use it for Ambari/Hive/Oozie
   copy:
@@ -59,7 +59,7 @@
     dest: /root/postgresql-42.2.1.jar
     owner: root
     group: root
-  when: inventory_hostname in groups['data_nodes'] and inventory_hostname == "opnstk1"
+  when: inventory_hostname in groups['name_nodes'] and inventory_hostname == "opnstk1"
 
 
 - name: Setting up Ambari Server with default values
@@ -70,3 +70,47 @@
 - name: Starting the Ambari Server  # then ssh -t -L8000:localhost:8080 root@opnstk1 -Nv and point your browser to localhost:8000
   shell: ambari-server start
   when: inventory_hostname in groups['all'] and inventory_hostname == "opnstk1"
+
+
+- name: removing old nodes file
+  file:
+    path: /root/nodes
+    state: absent
+    mode: 0644
+  ignore_errors: yes
+
+
+- name: writing new nodes file -- 1
+  file:
+    path: /root/nodes
+    state: touch
+    mode: 0644
+
+
+- name: writing new nodes file -- 2
+  lineinfile:
+    path: /root/nodes
+    state: present
+    line: "{{ hostvars[groups['name_nodes']['%s'|format(item)|int]]['dns_name'] }}"
+  with_sequence: start=0 end={{ groups['name_nodes'][1:] | length }}
+
+
+- name: writing new nodes file -- 3
+  lineinfile:
+    path: /root/nodes
+    state: present
+    line: "{{ hostvars[groups['data_nodes']['%s'|format(item)|int]]['dns_name'] }}"
+  with_sequence: start=0 end={{ groups['data_nodes'][1:] | length }}
+
+
+- name: installing pexpect
+  yum:
+    name: pexpect
+    state: present
+  when: inventory_hostname in groups['name_nodes']
+
+
+- name: create passwordless ssh between all nodes in the cluster
+  script: ../../sbin/passwdless.py root 000000 /root/nodes
+  when: inventory_hostname in groups['name_nodes']
+  ignore_errors: yes
