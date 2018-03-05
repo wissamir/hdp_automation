@@ -1,3 +1,5 @@
+# @author: wissamabuahmad
+
 - name: Prepare the cluster to install Ambari
   hosts: all
   roles:

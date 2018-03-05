@@ -1,3 +1,5 @@
+# @author: wissamabuahmad
+
 - name: Cleaning-up HDP from all nodes and rebooting...
   hosts: all
   roles:
