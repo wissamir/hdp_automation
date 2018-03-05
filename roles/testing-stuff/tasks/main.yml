@@ -57,16 +57,60 @@
 #  when: inventory_hostname in groups["data_nodes"] and inventory_hostname == "opnstk6"
 
 
-- name: Eliminate old mount points
-  file:
-    path: /grid
-    state: absent
-  when: inventory_hostname in groups["data_nodes"]
-  ignore_errors: yes  # in case already removed
+#- name: Eliminate old mount points
+#  file:
+#    path: /grid
+#    state: absent
+#  when: inventory_hostname in groups["data_nodes"]
+#  ignore_errors: yes  # in case already removed
+#
+#- name: Eliminate mounting script
+#  file:
+#    path: /root/mountfs.sh
+#    state: absent
+#  when: inventory_hostname in groups["data_nodes"]
+#  ignore_errors: yes # in case already removed
 
-- name: Eliminate mounting script
+- name: removing old nodes file
   file:
-    path: /root/mountfs.sh
+    path: /root/nodes
     state: absent
-  when: inventory_hostname in groups["data_nodes"]
-  ignore_errors: yes # in case already removed
+    mode: 0644
+  ignore_errors: yes
+
+
+- name: writing nodes file -- 1
+  file:
+    path: /root/nodes
+    state: touch
+    mode: 0644
+
+
+- name: writing nodes file -- 2
+  lineinfile:
+    path: /root/nodes
+    state: present
+    line: "{{ hostvars[groups['name_nodes']['%s'|format(item)|int]]['dns_name'] }}"
+  with_sequence: start=0 end={{ groups['name_nodes'][1:] | length }}
+
+
+- name: writing nodes file -- 3
+  lineinfile:
+    path: /root/nodes
+    state: present
+    line: "{{ hostvars[groups['data_nodes']['%s'|format(item)|int]]['dns_name'] }}"
+  with_sequence: start=0 end={{ groups['data_nodes'][1:] | length }}
+
+
+- name: installing pexpect
+  yum:
+    name: pexpect
+    state: present
+  when: inventory_hostname in groups['name_nodes']
+
+
+- name: create passwordless ssh between all nodes in the cluster
+  script: ../../sbin/passwdless.py root 000000 /root/nodes
+  when: inventory_hostname in groups['name_nodes']
+  ignore_errors: yes
+
