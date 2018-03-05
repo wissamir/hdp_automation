@@ -1,10 +1,10 @@
-opnstk1 ansible_host=root@opnstk1
-opnstk2 ansible_host=root@opnstk2 jbod_hdds=0
-sviluppo2 ansible_host=root@sviluppo2
-opnstk3 ansible_host=opnstk3 ansible_user=root jbod_hdds=8 mount_point_prefix=
-opnstk4 ansible_host=root@opnstk4 jbod_hdds=8 mount_point_prefix=
-opnstk5 ansible_host=root@opnstk5 jbod_hdds=9 mount_point_prefix=
-opnstk6 ansible_host=root@opnstk6 jbod_hdds=9 mount_point_prefix=
+opnstk1 ansible_host=root@opnstk1 dns_name=opnstk1.e4dot
+opnstk2 ansible_host=root@opnstk2 jbod_hdds=0 dns_name=opnstk2.e4dot
+sviluppo2 ansible_host=root@sviluppo2 dns_name=sviluppo2.e4dot
+opnstk3 ansible_host=opnstk3 ansible_user=root jbod_hdds=8 mount_point_prefix= dns_name=opnstk3.e4dot
+opnstk4 ansible_host=root@opnstk4 jbod_hdds=8 mount_point_prefix= dns_name=opnstk4.e4dot
+opnstk5 ansible_host=root@opnstk5 jbod_hdds=9 mount_point_prefix= dns_name=opnstk5.e4dot
+opnstk6 ansible_host=root@opnstk6 jbod_hdds=9 mount_point_prefix= dns_name=opnstk6.e4dot
 
 
 [name_nodes]
