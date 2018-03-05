@@ -1,3 +1,5 @@
+# @author: wissamabuahmad
+
 # corner case.. first list is empty [] ??? does it treat it?
 
 - set_fact: current_node={{ groups["data_nodes"][i|int] }}

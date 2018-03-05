@@ -1,4 +1,6 @@
 ---
+# @author: wissamabuahmad
+
 # tasks file for solve-locale-problem
 - name: copy my-custom.lang.sh to solve the problem Failed to set locale, defaulting to C # https://www.cyberciti.biz/faq/failed-to-set-locale-defaulting-to-c-warning-message-on-centoslinux/
   copy:

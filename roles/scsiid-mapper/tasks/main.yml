@@ -1,4 +1,6 @@
 ---
+# @author: wissamabuahmad
+
 # tasks file for scsiid-mapper
 
 - name: Map unique scsi-id to device names

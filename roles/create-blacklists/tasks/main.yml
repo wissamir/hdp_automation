@@ -1,4 +1,6 @@
 ---
+# @author: wissamabuahmad
+
 # tasks file for create-blacklists
 
 # set a localhost scsiid2 variable using one of the available datanodes (scsiid2 variable for the different datanodes must be identical)

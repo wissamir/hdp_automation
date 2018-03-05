@@ -1,7 +1,11 @@
 ---
+# @author: wissamabuahmad
+
 # tasks file for Ambari-preparation
 # TODOs: the following are task to get environment prepared to install Ambari.. put them in one role "ambari-preparation"
 # 1. role to collect pairs qualified domain name (FQDN) on each node (namenode, datanode) + IP address of eno1 - modify the /etc/hosts file
+#    No need to do it if you have a DNS configured
+
 #    Check DNS and NSCD  https://docs.hortonworks.com/HDPDocuments/Ambari-2.6.1.0/bk_ambari-installation/content/check_dns.html
 #    All hosts in your system must be configured for both forward and and reverse DNS.
 #    If you are unable to configure DNS in this way, you should edit the /etc/hosts file on every host in your cluster to contain the IP address and Fully Qualified Domain Name of each of your hosts.
