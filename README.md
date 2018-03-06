@@ -45,12 +45,15 @@ Below are some of the critical issues that require careful planning
      - For Hive, the default database is MySQL that will be downloaded automatically by Ambari during cluster deployment
        - [JDBC connector must be configured](https://docs.hortonworks.com/HDPDocuments/Ambari-2.6.1.0/bk_ambari-administration/content/using_hive_with_mysql.html)
      - For Oozie, the default database is Derby that has an already integrated JDBC connector and need no further operations
+       - Derby is not recommended for production use. With Derby, Oozie Server HA and concurrent connection support will not be available
    - For production grade HDP cluster, it is highly recommended to use external databases for the above services 
      that are configured in HA in order to guarantee business continuity 
 * Service distribution between namenodes and datanodes. Frameworks such Hive, HBase, Spark, Kafka are resource-intensive and might
   require a careful planning while deployment (services to deploy on dedicated nodes, and other services to deploy on the same nodes in order to make 
   a better use of data-locality)
-
+* Consider dedicating special tracking nodes (refer to cluster planning) 
+* HBase selection for Atlas (if to use the default HBase or a new HBase instance)
+* Test HA for namenodes, zookeeper... etc
 
 
 Refer to the [Apache Ambari Administration](https://docs.hortonworks.com/HDPDocuments/Ambari-2.6.1.0/bk_ambari-administration/bk_ambari-administration.pdf) for
